@@ -1,0 +1,24 @@
+{
+  "name": "AimsQuant",
+  "authors": [
+    "sauravbiswas <saru.sreyo@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.8.0",
+    "paper-material": "PolymerElements/paper-material#^1.0.6",
+    "paper-button": "PolymerElements/paper-button#^1.0.14",
+    "paper-spinner": "PolymerElements/paper-spinner#^1.2.1",
+    "paper-progress": "PolymerElements/paper-progress#^1.0.11"
+  }
+}

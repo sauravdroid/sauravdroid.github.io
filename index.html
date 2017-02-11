@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <link rel="import" href="custom_components/table-element.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="stylesheet" href="index.css">
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+</head>
+<body>
+<header>
+    <paper-progress id="progress" indeterminate></paper-progress>
+    <h1 class="header">AimsQuant</h1>
+
+    <ul style="list-style: none" class="menu-list">
+        <li>
+
+            <paper-button id="btn-start" noink class="btn dates">Start - none</paper-button>
+
+        </li>
+        <li>
+
+            <paper-button id="btn-end" noink class="btn dates">End - none</paper-button>
+
+        </li>
+        <li>
+            <paper-button class="btn" id="chooseDate">Choose Date</paper-button>
+        </li>
+        <li>
+            <paper-button class="btn" id="myBtn">Check</paper-button>
+        </li>
+    </ul>
+
+
+    <div id="topbar">
+        <div class="chooser-container">
+            <input type="date" id="start_date">
+            <input type="date" id="end_date">
+            <paper-button class="btn" raised="" id="doneDate">Done</paper-button>
+        </div>
+    </div>
+</header>
+<section>
+
+
+    <paper-table headerId="asdasd" bodyId="1" id="paper_table" elevation="2"></paper-table>
+
+    <div class="bottom-bar">
+        <div class="text-container">
+            <div class="btn-container">
+                <paper-button class="btn bottm-btn" id="top5"> Top 5</paper-button>
+                <paper-button class="btn bottm-btn" id="bottom5"> Bottom 5</paper-button>
+                <paper-button class="btn bottm-btn" id="showAll"> All</paper-button>
+
+            </div>
+
+            <h3 id="company">AimsQuant</h3>
+            <h5 id="symbol">Stock Analysis</h5>
+
+            <paper-table headerId="2" bodyId="2" id="paper_table2" elevation="3"></paper-table>
+        </div>
+        <paper-button raised="" class="btn" id="close"> Close</paper-button>
+        <div id="chart_div"></div>
+    </div>
+</section>
+<script>
+    $(document).ready(function () {
+        var selected_items = [];
+        var company_json = [
+            {
+                "FIELD1": "Company Name",
+                "FIELD2": "Industry",
+                "FIELD3": "Symbol",
+                "FIELD4": "Series",
+                "FIELD5": "ISIN Code"
+            },
+            {
+                "FIELD1": "ABB India Ltd.",
+                "FIELD2": "INDUSTRIAL MANUFACTURING",
+                "FIELD3": "ABB",
+                "FIELD4": "EQ",
+                "FIELD5": "INE117A01022"
+            },
+            {
+                "FIELD1": "Apollo Hospitals Enterprises Ltd.",
+                "FIELD2": "HEALTHCARE SERVICES",
+                "FIELD3": "APOLLOHOSP",
+                "FIELD4": "EQ",
+                "FIELD5": "INE437A01024"
+            },
+            {
+                "FIELD1": "Ashok Leyland Ltd.",
+                "FIELD2": "AUTOMOBILE",
+                "FIELD3": "ASHOKLEY",
+                "FIELD4": "EQ",
+                "FIELD5": "INE208A01029"
+            },
+            {
+                "FIELD1": "Bajaj Finance Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "BAJFINANCE",
+                "FIELD4": "EQ",
+                "FIELD5": "INE296A01024"
+            },
+            {
+                "FIELD1": "Bajaj Finserv Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "BAJAJFINSV",
+                "FIELD4": "EQ",
+                "FIELD5": "INE918I01018"
+            },
+            {
+                "FIELD1": "Bharat Electronics Ltd.",
+                "FIELD2": "INDUSTRIAL MANUFACTURING",
+                "FIELD3": "BEL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE263A01016"
+            },
+            {
+                "FIELD1": "Bharat Forge Ltd.",
+                "FIELD2": "INDUSTRIAL MANUFACTURING",
+                "FIELD3": "BHARATFORG",
+                "FIELD4": "EQ",
+                "FIELD5": "INE465A01025"
+            },
+            {
+                "FIELD1": "Britannia Industries Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "BRITANNIA",
+                "FIELD4": "EQ",
+                "FIELD5": "INE216A01022"
+            },
+            {
+                "FIELD1": "Cadila Healthcare Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "CADILAHC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE010B01027"
+            },
+            {
+                "FIELD1": "Castrol India Ltd.",
+                "FIELD2": "ENERGY",
+                "FIELD3": "CASTROLIND",
+                "FIELD4": "EQ",
+                "FIELD5": "INE172A01027"
+            },
+            {
+                "FIELD1": "Colgate Palmolive (India) Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "COLPAL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE259A01022"
+            },
+            {
+                "FIELD1": "Container Corporation of India Ltd.",
+                "FIELD2": "SERVICES",
+                "FIELD3": "CONCOR",
+                "FIELD4": "EQ",
+                "FIELD5": "INE111A01017"
+            },
+            {
+                "FIELD1": "Cummins India Ltd.",
+                "FIELD2": "INDUSTRIAL MANUFACTURING",
+                "FIELD3": "CUMMINSIND",
+                "FIELD4": "EQ",
+                "FIELD5": "INE298A01020"
+            },
+            {
+                "FIELD1": "DLF Ltd.",
+                "FIELD2": "CONSTRUCTION",
+                "FIELD3": "DLF",
+                "FIELD4": "EQ",
+                "FIELD5": "INE271C01023"
+            },
+            {
+                "FIELD1": "Dabur India Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "DABUR",
+                "FIELD4": "EQ",
+                "FIELD5": "INE016A01026"
+            },
+            {
+                "FIELD1": "Divi's Laboratories Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "DIVISLAB",
+                "FIELD4": "EQ",
+                "FIELD5": "INE361B01024"
+            },
+            {
+                "FIELD1": "Emami Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "EMAMILTD",
+                "FIELD4": "EQ",
+                "FIELD5": "INE548C01032"
+            },
+            {
+                "FIELD1": "GlaxoSmithkline Consumer Healthcare Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "GSKCONS",
+                "FIELD4": "EQ",
+                "FIELD5": "INE264A01014"
+            },
+            {
+                "FIELD1": "Glaxosmithkline Pharmaceuticals Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "GLAXO",
+                "FIELD4": "EQ",
+                "FIELD5": "INE159A01016"
+            },
+            {
+                "FIELD1": "Glenmark Pharmaceuticals Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "GLENMARK",
+                "FIELD4": "EQ",
+                "FIELD5": "INE935A01035"
+            },
+            {
+                "FIELD1": "Godrej Consumer Products Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "GODREJCP",
+                "FIELD4": "EQ",
+                "FIELD5": "INE102D01028"
+            },
+            {
+                "FIELD1": "Havells India Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "HAVELLS",
+                "FIELD4": "EQ",
+                "FIELD5": "INE176B01034"
+            },
+            {
+                "FIELD1": "Hindustan Petroleum Corporation Ltd.",
+                "FIELD2": "ENERGY",
+                "FIELD3": "HINDPETRO",
+                "FIELD4": "EQ",
+                "FIELD5": "INE094A01015"
+            },
+            {
+                "FIELD1": "Hindustan Zinc Ltd.",
+                "FIELD2": "METALS",
+                "FIELD3": "HINDZINC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE267A01025"
+            },
+            {
+                "FIELD1": "Indiabulls Housing Finance Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "IBULHSGFIN",
+                "FIELD4": "EQ",
+                "FIELD5": "INE148I01020"
+            },
+            {
+                "FIELD1": "Indian Oil Corporation Ltd.",
+                "FIELD2": "ENERGY",
+                "FIELD3": "IOC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE242A01010"
+            },
+            {
+                "FIELD1": "InterGlobe Aviation Ltd.",
+                "FIELD2": "SERVICES",
+                "FIELD3": "INDIGO",
+                "FIELD4": "EQ",
+                "FIELD5": "INE646L01027"
+            },
+            {
+                "FIELD1": "JSW Steel Ltd.",
+                "FIELD2": "METALS",
+                "FIELD3": "JSWSTEEL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE019A01038"
+            },
+            {
+                "FIELD1": "LIC Housing Finance Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "LICHSGFIN",
+                "FIELD4": "EQ",
+                "FIELD5": "INE115A01026"
+            },
+            {
+                "FIELD1": "Marico Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "MARICO",
+                "FIELD4": "EQ",
+                "FIELD5": "INE196A01026"
+            },
+            {
+                "FIELD1": "Motherson Sumi Systems Ltd.",
+                "FIELD2": "AUTOMOBILE",
+                "FIELD3": "MOTHERSUMI",
+                "FIELD4": "EQ",
+                "FIELD5": "INE775A01035"
+            },
+            {
+                "FIELD1": "NHPC Ltd.",
+                "FIELD2": "ENERGY",
+                "FIELD3": "NHPC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE848E01016"
+            },
+            {
+                "FIELD1": "NMDC Ltd.",
+                "FIELD2": "METALS",
+                "FIELD3": "NMDC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE584A01023"
+            },
+            {
+                "FIELD1": "Oil India Ltd.",
+                "FIELD2": "ENERGY",
+                "FIELD3": "OIL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE274J01014"
+            },
+            {
+                "FIELD1": "Oracle Financial Services Software Ltd.",
+                "FIELD2": "IT",
+                "FIELD3": "OFSS",
+                "FIELD4": "EQ",
+                "FIELD5": "INE881D01027"
+            },
+            {
+                "FIELD1": "Pidilite Industries Ltd.",
+                "FIELD2": "CHEMICALS",
+                "FIELD3": "PIDILITIND",
+                "FIELD4": "EQ",
+                "FIELD5": "INE318A01026"
+            },
+            {
+                "FIELD1": "Piramal Enterprises Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "PEL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE140A01024"
+            },
+            {
+                "FIELD1": "Power Finance Corporation Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "PFC",
+                "FIELD4": "EQ",
+                "FIELD5": "INE134E01011"
+            },
+            {
+                "FIELD1": "Procter & Gamble Hygiene & Health Care Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "PGHH",
+                "FIELD4": "EQ",
+                "FIELD5": "INE179A01014"
+            },
+            {
+                "FIELD1": "Punjab National Bank",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "PNB",
+                "FIELD4": "EQ",
+                "FIELD5": "INE160A01022"
+            },
+            {
+                "FIELD1": "Shree Cement Ltd.",
+                "FIELD2": "CEMENT & CEMENT PRODUCTS",
+                "FIELD3": "SHREECEM",
+                "FIELD4": "EQ",
+                "FIELD5": "INE070A01015"
+            },
+            {
+                "FIELD1": "Shriram Transport Finance Co. Ltd.",
+                "FIELD2": "FINANCIAL SERVICES",
+                "FIELD3": "SRTRANSFIN",
+                "FIELD4": "EQ",
+                "FIELD5": "INE721A01013"
+            },
+            {
+                "FIELD1": "Siemens Ltd.",
+                "FIELD2": "INDUSTRIAL MANUFACTURING",
+                "FIELD3": "SIEMENS",
+                "FIELD4": "EQ",
+                "FIELD5": "INE003A01024"
+            },
+            {
+                "FIELD1": "Steel Authority of India Ltd.",
+                "FIELD2": "METALS",
+                "FIELD3": "SAIL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE114A01011"
+            },
+            {
+                "FIELD1": "Titan Company Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "TITAN",
+                "FIELD4": "EQ",
+                "FIELD5": "INE280A01028"
+            },
+            {
+                "FIELD1": "Torrent Pharmaceuticals Ltd.",
+                "FIELD2": "PHARMA",
+                "FIELD3": "TORNTPHARM",
+                "FIELD4": "EQ",
+                "FIELD5": "INE685A01028"
+            },
+            {
+                "FIELD1": "UPL Ltd.",
+                "FIELD2": "FERTILISERS & PESTICIDES",
+                "FIELD3": "UPL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE628A01036"
+            },
+            {
+                "FIELD1": "United Breweries Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "UBL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE686F01025"
+            },
+            {
+                "FIELD1": "United Spirits Ltd.",
+                "FIELD2": "CONSUMER GOODS",
+                "FIELD3": "MCDOWELL-N",
+                "FIELD4": "EQ",
+                "FIELD5": "INE854D01016"
+            },
+            {
+                "FIELD1": "Vedanta Ltd.",
+                "FIELD2": "METALS",
+                "FIELD3": "VEDL",
+                "FIELD4": "EQ",
+                "FIELD5": "INE205A01025"
+            }
+        ];
+        var start_date;
+        var end_date;
+        var tableElement2 = document.querySelector('#paper_table2');
+        tableElement2.bodyId = "tableBody2";
+        tableElement2.headerId = "tableHeader2";
+        tableElement2.initializeTable();
+        tableElement2.alternateRow = true;
+        tableElement2.setHeader(['Stock Name->200px', 'Metric Value->200px']);
+
+        var tableElement = document.querySelector('#paper_table');
+        tableElement.bodyId = "tableBody1";
+        tableElement.headerId = "tableHeader1";
+        tableElement.initializeTable();
+        tableElement.alternateRow = true;
+        tableElement.style.marginTop = "50px";
+        tableElement.setHeader(['Company', 'Industry->250px', 'Symbol->150px', 'Series->80px', 'ISIN Code->200px']);
+        var data = [];
+        var url = "";
+        var metric = [];
+
+        for (var i = 1; i < company_json.length; i++) {
+            tableElement.addRow([company_json[i].FIELD1, company_json[i].FIELD2, company_json[i].FIELD3, company_json[i].FIELD4, company_json[i].FIELD5])
+        }
+
+        $('#myBtn').on('click', function () {
+            var stocks = [];
+
+            for (var i = 0; i < selected_items.length; i++) {
+                $("#progress").css({"display": "block"});
+                var company_name = company_json[selected_items[i]].FIELD3;
+                $.ajax({
+                    url: "https://www.quandl.com/api/v3/datasets/NSE/" + company_name + ".json",
+                    type: "GET",
+                    data: {
+                        api_key: "gWf2CLShwrGUBVnqzsT4",
+                        start_data: start_date,
+                        end_date: end_date
+                    },
+                    async: true,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        var item = {name: "", metric: ""};
+                        var data = response.dataset.data;
+                        var average = getAverage(data);
+                        //console.log(response.dataset.dataset_code);
+                        var last_close = data[0][5];
+                        var metricValue = last_close / average;
+                        item.name = response.dataset.dataset_code;
+                        item.metric = metricValue;
+                        metric.push(item);
+                        console.log(metric);
+                        console.log("Metric Length " + metric.length);
+                        if (metric.length == selected_items.length) {
+                            metric.sort(function (a, b) {
+                                return b.metric - a.metric;
+                            });
+                            drawChart();
+                            if (metric.length <= 5) {
+                                $("#progress").css({"display": "none"});
+                                for (var j = 0; j < metric.length; j++) {
+                                    tableElement2.addRow([metric[j].name, metric[j].metric]);
+                                }
+                            } else {
+                                for (var k = 0; k < 5; k++) {
+                                    tableElement2.addRow([metric[k].name, metric[k].metric]);
+                                }
+                            }
+                            $('.bottom-bar').css({"transform": "translate(0,0)"});
+                        }
+
+                    },
+                    error: function (response) {
+                        console.log(response.data);
+                    }
+                });
+
+
+            }
+        });
+        $('#close').on('click', function () {
+            $('.bottom-bar').css({"transform": "translate(0,100%)"});
+            tableElement2.destroyBody();
+            $("#progress").css({"display": "none"});
+            metric = [];
+        });
+
+
+//        $('td').bind("contextmenu", function () {
+//            var index = $(this).parent().index() + 1;
+//            alert(company_json[index].FIELD1);
+//        });
+        $('td').on('click', function () {
+            var index = $(this).parent().index() + 1;
+            var company_name = company_json[index].FIELD1;
+            var company_symbol = company_json[index].FIELD3;
+            if (selected_items.indexOf(index) === -1) {
+                selected_items.push(index);
+                $(this).parent().css({"background-color": "#F48FB1"});
+            } else {
+                selected_items.splice(selected_items.indexOf(index), 1);
+                $(this).parent().css({"background-color": "#fff"});
+            }
+
+        });
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages': ['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        //google.charts.setOnLoadCallback(drawChart);
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+            var metric_new = [];
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Stock Name');
+            data.addColumn('number', 'Metric');
+            if (metric.length < 5) {
+                metric_new = metric;
+            } else {
+                for (var i = 0; i < 5; i++) {
+                    metric_new[i] = metric[i];
+                }
+            }
+            data.addRows(
+                    convertJSON(metric_new)
+            );
+
+            // Set chart options
+            var options = {
+                'title': 'Bar Chart for Stocks',
+                'width': 400,
+                'height': 300
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+
+        function drawChartMod(items) {
+            var metric_new = [];
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Stock Name');
+            data.addColumn('number', 'Metric');
+            data.addRows(
+                    convertJSON(items)
+            );
+
+            // Set chart options
+            var options = {
+                'title': 'Bar Chart for Stocks',
+                'width': 400,
+                'height': 300
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+
+        function getAverage(items) {
+            var sum = 0;
+
+            for (var i = 0; i < items.length; i++) {
+                sum += items[i][5];
+            }
+            return sum / items.length;
+        }
+
+        function convertJSON(metric) {
+            var metric_new = [];
+            for (var i = 0; i < metric.length; i++) {
+                var metric_nested = [];
+                metric_nested.push(metric[i].name);
+                metric_nested.push(metric[i].metric);
+                metric_new.push(metric_nested);
+                //console.log(metric_nested);
+            }
+            //console.log(metric_new);
+            return metric_new;
+        }
+
+        $('#symbol').on('click', function () {
+            tableElement2.destroyBody();
+            for (var j = 0; j < metric.length; j++) {
+                tableElement2.addRow([metric[j].name, metric[j].metric]);
+            }
+        });
+        $('#top5').on('click', showTop5);
+        $('#bottom5').on('click', bottom5);
+        $('#showAll').on('click', showAll);
+        $('#chooseDate').on('click', function () {
+            $('#topbar').css({"transform": "translate(0,0)"})
+        });
+        $('#doneDate').on('click', function () {
+            var today = formatDate();
+            console.log(today);
+            start_date = document.getElementById('start_date').value;
+            end_date = document.getElementById('end_date').value;
+            document.getElementById('btn-start').innerHTML = "Start - " + start_date;
+            document.getElementById('btn-end').innerHTML = "End - " + end_date;
+
+            if ((start_date > "2016-01-01") && (end_date > start_date) && (end_date <= today)) {
+                $('#topbar').css({"transform": "translate(0,-300px)"});
+            } else {
+                alert("Error Occured");
+            }
+        });
+        function showTop5() {
+            tableElement2.destroyBody();
+            var metric_new = [];
+            metric.sort(function (a, b) {
+                return b.metric - a.metric;
+            });
+            if (metric.length < 5) {
+                metric_new = metric;
+                for (var j = 0; j < metric.length; j++) {
+                    tableElement2.addRow([metric[j].name, metric[j].metric]);
+                }
+            } else {
+                for (var k = 0; k < 5; k++) {
+                    metric_new.push(metric[k]);
+                    tableElement2.addRow([metric[k].name, metric[k].metric]);
+                }
+            }
+            drawChartMod(metric_new);
+        }
+
+        function showAll() {
+            tableElement2.destroyBody();
+            metric.sort(function (a, b) {
+                return b.metric - a.metric;
+            });
+            drawChartMod(metric);
+            for (var k = 0; k < metric.length; k++) {
+                tableElement2.addRow([metric[k].name, metric[k].metric]);
+            }
+
+        }
+
+        function bottom5() {
+            var metric_new = [];
+            tableElement2.destroyBody();
+            metric.sort(function (a, b) {
+                return b.metric - a.metric;
+            });
+
+            if (metric.length < 5) {
+                metric_new = metric;
+                for (var k = metric.length - 1; k >= 0; k--) {
+                    tableElement2.addRow([metric[k].name, metric[k].metric]);
+                }
+            } else {
+                for (var j = metric.length - 1; j >= metric.length - 5; j--) {
+                    metric_new.push(metric[j]);
+                    tableElement2.addRow([metric[j].name, metric[j].metric]);
+                }
+            }
+            drawChartMod(metric_new);
+        }
+
+        function formatDate() {
+            var d = new Date(),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+    });
+</script>
+</body>
+</html>

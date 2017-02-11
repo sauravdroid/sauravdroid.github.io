@@ -1,0 +1,167 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<dom-module id="paper-table">
+    <link rel="stylesheet" href="table-element.css">
+    <template>
+        <paper-material elevation="{{elevation}}" class="tableN">
+            <table >
+                <thead>
+                    <tr id="{{headerId}}"></tr>
+                </thead>
+                <tbody id="{{bodyId}}"></tbody>
+            </table>
+        </paper-material>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is:"paper-table",
+        properties:{
+            elevation:{
+                type:Number,
+                value:1
+            },
+            bodyId:{
+                type:Number
+            },
+            headerId:{
+                type:Number
+            },
+            headerCount:{
+                type:Number,
+                value:0
+            },
+            borderRadius:{
+                type:Number,
+                value:4
+            },
+            row_width:{
+                type:String,
+                value:' '
+            },
+            headerColor:{
+                type:String,
+                value:"#26C6DA"
+            },
+            header:{
+                type:Object
+            },
+            alternateRow:{
+                type:Boolean,
+                value:false
+            },
+            rowCount:{
+                type:Number,
+                value:0
+            },
+            alternateRowColor:{
+                type:String,
+                value:"#B2EBF2"
+            },
+            tableRow:{
+                type:Array
+            }
+        },
+        ready:function () {
+            var paper_material = document.querySelector('paper-material');
+            paper_material.style.display = "inline-block"
+        },
+        applyBorder:function(borderRadius){
+            this.borderRadius=borderRadius+"px";
+            var table=document.querySelector('.tableN');
+            table.style.borderRadius=this.borderRadius;
+        },
+        setHeader:function(name){
+            this.headerCount=name.length;
+            this.header=document.getElementById(this.headerId);
+            var th=[];
+            var span=[];
+            var i;
+            var h5=[];
+            for(i=0;i<name.length;i++){
+                var textNode;
+                var text;
+                span[i]=document.createElement('span');
+                th[i]=document.createElement('th');
+                var arr=name[i].split('->');
+                if(arr.length>1){
+                    th[i].style.width=arr[1];
+                    text=arr[0];
+                }else{
+                    text=name[i];
+                }
+                h5[i]=document.createElement('h5');
+                textNode=document.createTextNode(text);
+                h5[i].appendChild(textNode);
+                span[i].appendChild(h5[i]);
+                th[i].appendChild(span[i]);
+                this.header.appendChild(th[i]);
+                h5[i].className="table_th_h5";
+                th[i].className="table_th";
+                span[i].className="table_th_span";
+                span[i].style.height="20px";
+            }
+            th[0].style.borderTopLeftRadius=this.borderRadius;
+            th[i-1].style.borderTopRightRadius=this.borderRadius;
+        },
+        addRow:function(elementsArray){
+            var td=[];
+            var i=0;
+            var h5=[];
+            var tableBody=document.getElementById(this.bodyId);
+            var tableRow=document.createElement('tr');
+            if(this.headerCount==elementsArray.length){
+                this.rowCount++;
+                //console.log(this.rowCount);
+                tableRow.id="td"+this.rowCount;
+                if(this.alternateRow==true){
+                    if(this.rowCount%2==0){
+                        tableRow.style.backgroundColor=this.alternateRowColor;
+                    }
+                }
+                for(i=0;i<this.headerCount;i++){
+                    td[i]=document.createElement('td');
+                    h5[i]=document.createElement('h5');
+                    var textNode=document.createTextNode(elementsArray[i]);
+                    h5[i].appendChild(textNode);
+                    td[i].appendChild(h5[i]);
+                    tableRow.appendChild(td[i]);
+                    tableRow.className="tableRow";
+                    td[i].className="table_td";
+                    h5[i].className="table_td_h5";
+                }
+                tableBody.appendChild(tableRow);
+
+            }else{
+                console.log("Error");
+            }
+        },
+        setHeaderColor:function(color){
+            this.header=document.getElementById(this.headerId);
+            this.header.style.backgroundColor=color;
+        },
+        addBottomBorder:function(){
+            var lastRow=document.getElementById('td'+this.rowCount);
+            lastRow.childNodes[0].style.borderBottomLeftRadius=this.borderRadius;
+            lastRow.childNodes[this.headerCount-1].style.borderBottomRightRadius=this.borderRadius;
+        },
+        initializeTable:function(border,headerColor,alternateRow,alternateRowColor,elevation){
+            border=(border==null)?this.borderRadius:border;
+            headerColor=(headerColor==null)?this.headerColor:headerColor;
+            alternateRow=(alternateRow==null)?this.alternateRow:alternateRow;
+            alternateRowColor=(alternateRowColor==null)?this.alternateRowColor:alternateRowColor;
+            elevation=(elevation==null)?this.elevation:elevation;
+            this.applyBorder(border);
+            this.setHeaderColor(headerColor);
+            this.alternateRow=alternateRow;
+            this.alternateRowColor=alternateRowColor;
+            this.elevation=elevation;
+            //console.log(this.bodyId + " " +this.headerId);
+        },
+        destroyBody:function () {
+            document.querySelector("#"+this.bodyId).innerHTML = "";
+        }
+    });
+
+</script>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="import" href="custom_components/table-element.html">
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+</head>
+<body>
+    <paper-table id="paper_table"></paper-table>
+    <script type="text/javascript">
+        var tableElement=document.querySelector('#paper_table');
+        tableElement.initializeTable();
+        tableElement.alternateRow = true;
+        tableElement.setHeader(['Sl No.','Name->250px','No. of Events']);
+        tableElement.addRow(['1','Dance',2]);
+        tableElement.addRow(['2','Music',2]);
+        tableElement.addRow(['3','Fashion and Arts',2]);
+        tableElement.addRow(['4','Digital Arts',2]);
+        tableElement.addRow(['5','Speaking Arts',2]);
+        tableElement.addBottomBorder();
+    </script>
+</body>
+</html>

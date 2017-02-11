@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
+body{
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    flex-direction: column;
+
+}
+section{
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.bottom-bar{
+    overflow-y: auto;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height:100%;
+    display: flex;
+    background-color: #263238;
+    transform: translate(0,100%);
+    transition: all 0.4s ease-in-out;
+    flex-direction: row;
+    z-index:10;
+    padding-bottom: 20px;
+}
+
+
+.text-container{
+    position: relative;
+    left: 5%;
+    top:20px;
+
+}
+#company{
+    color:#fff;
+    position: relative;
+    font-family: 'Roboto' , sans-serif;
+    font-weight: 700;
+}
+#symbol{
+    color:#fff;
+    position: relative;
+    top:-10px;
+    font-family: 'Roboto' , sans-serif;
+    font-weight: 400;
+}
+#chart_div{
+    position: relative;
+    top:20%;
+    left:15%;
+}
+
+
+#topbar{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height:150px;
+    position: fixed;
+    background-color: #0d47a1;
+    top:0;
+    z-index: 10;
+    transform: translate(0,-300px);
+    transition: all 0.4s ease;
+}
+#progress{
+    width: 100%;
+
+    display: none;
+}
+header{
+    position: relative;
+    top:0;
+    width: 100%;
+    height:100px;
+    background-color: #3f51b5;
+}
+.menu-list{
+    position: absolute;
+    right:20px;
+}
+.menu-list li{
+    float: left;
+}
+.btn{
+    font-family: 'Roboto' , sans-serif;
+    color:#fff;
+
+}
+.header{
+    font-family: 'Roboto' , sans-serif;
+    font-weight: 400;
+    font-size: 30px;
+    color:#fff;
+    position: absolute;
+    top:5%;
+    left:5%;
+
+}
+
+.dates{
+    color:#ee9911;
+    font-size: 16px;
+}
+.chooser-container{
+    top:50px;
+    position: relative;
+}
+#doneDate{
+    display: inline-block;
+    background-color: #e91e63;
+}
+.btn-container{
+    position: relative;
+    left:-28px;
+}
+#close{
+    position: absolute;
+    right:20px;
+    top:30px;
+    font-size: 16px;
+    background-color: #e91e63;
+}
+.bottm-btn{
+    color:#ee9911;
+}
