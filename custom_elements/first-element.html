@@ -16,6 +16,9 @@
                 position: absolute;
                 right: 10px;
             }
+            #scrolling{
+                width: 750px;
+            }
         </style>
 
 
@@ -496,7 +499,8 @@
                     var last_close = dataArray[0][5];
                     var metricValue = last_close / average;
                     item.name = response.dataset.dataset_code;
-                    item.metric = metricValue;
+
+                    item.metric = Math.round(metricValue * 100) / 100;
                     this.push('metricArray', item);
                     if (this.metricArray.length == this.selected.length) {
                         this.$.error_toast.toggle();

@@ -24,6 +24,9 @@
         .list {
 
         }
+        .chart{
+            margin-left: 60px;
+        }
     </style>
     <template>
 
@@ -36,7 +39,7 @@
             <div class="container">
                 <ol class="list">
                     <template is="dom-repeat" items="{{metric1}}">
-                        <li>{{item.name}} -> {{item.metric}}</li>
+                        <li>{{item.name}} &nbsp;({{item.metric}})</li>
                     </template>
                 </ol>
                 <div class="chart" id="chart_div1"></div>
@@ -44,7 +47,7 @@
             <div class="container">
                 <ol class="list">
                     <template is="dom-repeat" items="{{metric2}}">
-                        <li>{{item.name}} -> {{item.metric}}</li>
+                        <li>{{item.name}} &nbsp;({{item.metric}})</li>
                     </template>
                 </ol>
                 <div class="chart" id="chart_div2"></div>
@@ -52,7 +55,7 @@
             <div class="container">
                 <ol class="list">
                     <template is="dom-repeat" items="{{metric3}}">
-                        <li>{{item.name}} -> {{item.metric}}</li>
+                        <li>{{item.name}} &nbsp;({{item.metric}})</li>
                     </template>
                 </ol>
                 <div class="chart" id="chart_div3"></div>
@@ -172,7 +175,7 @@
             // Set chart options
             var options = {
                 'title': 'Stock Items',
-                'width': 400,
+                'width': 450,
                 'height': 300
             };
 
