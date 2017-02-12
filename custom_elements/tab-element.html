@@ -1,0 +1,174 @@
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html"/>
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html"/>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<dom-module id="my-tab">
+    <style>
+        :root {
+            --my-custom-color: red;
+            --paper-tab-ink: var(--my-custom-color);
+
+            /* custom CSS property */
+            --paper-tabs-selection-bar-color: blue;
+
+            /* custom CSS mixin */
+            --paper-tabs: {
+                color: var(--default-primary-color); /* variable defined in default-theme.html */
+                font-size: 20px;
+            }
+        }
+        .container{
+            display: inline-flex;
+            flex-direction: row;
+        }
+        .list{
+
+        }
+    </style>
+    <template>
+
+        <paper-tabs selected="0">
+            <paper-tab>Top 5</paper-tab>
+            <paper-tab>Bottom 5</paper-tab>
+            <paper-tab>All</paper-tab>
+        </paper-tabs>
+        <iron-pages selected="0">
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric1}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div1"></div>
+            </div>
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric2}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div2"></div>
+            </div>
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric3}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div3"></div>
+            </div>
+        </iron-pages>
+    </template>
+    <script>
+        Polymer({
+            is: "my-tab",
+            properties: {
+                name:{
+                    type:String
+                },
+                metric1: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 1},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 4},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
+                },
+                metric2: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 15},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 17},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
+                },
+                metric3: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 10},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 5},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
+                }
+            },
+            ready: function () {
+                console.log(this.name);
+                var pages = this.$$('iron-pages');
+                var tabs = this.$$('paper-tabs');
+                var metric1 = this.metric1;
+                var metric2 = this.metric2;
+                var metric3 = this.metric3;
+                tabs.addEventListener('iron-select', function () {
+                    pages.selected = tabs.selected;
+                });
+                google.charts.load('current', {'packages': ['corechart']});
+
+                // Set a callback to run when the Google Visualization API is loaded.
+                var chart1 = function () {
+                    return drawChart(metric1,'chart_div1');
+                };
+                var chart2 = function () {
+                    return drawChart(metric2,'chart_div2');
+                };
+                var chart3 = function () {
+                    return drawChart(metric3,'chart_div3');
+                };
+                google.charts.setOnLoadCallback(chart1);
+                google.charts.setOnLoadCallback(chart2);
+                google.charts.setOnLoadCallback(chart3);
+            }
+        });
+        function drawChart(metric , element ) {
+            console.log(metric);
+//            var metric = [
+//                {name:"Saurav" , metric:1},
+//                {name:"Umaima" , metric:2},
+//                {name:"Shaunak" , metric:3},
+//                {name:"Suraj" , metric:4},
+//                {name:"Arjun" , metric:6},
+//                {name:"Rahul" , metric:7},
+//                {name:"Tuhin" , metric:8}
+//            ];
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Slices');
+            data.addRows(
+                    convertJSON(metric)
+            );
+
+            // Set chart options
+            var options = {
+                'title': 'Stock Items',
+                'width': 400,
+                'height': 300
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.BarChart(document.getElementById(element));
+            chart.draw(data, options);
+        }
+        function convertJSON(metric) {
+            var metric_new = [];
+            for (var i = 0; i < metric.length; i++) {
+                var metric_nested = [];
+                metric_nested.push(metric[i].name);
+                metric_nested.push(metric[i].metric);
+                metric_new.push(metric_nested);
+                //console.log(metric_nested);
+            }
+            return metric_new;
+        }
+    </script>
+</dom-module>
