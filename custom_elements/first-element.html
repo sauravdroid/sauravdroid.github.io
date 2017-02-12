@@ -481,6 +481,8 @@
                             };
                             this.$.ajax.generateRequest();
                         }
+                        this.$.error_toast.innerHTML = "Loading Please Wait";
+                        this.$.error_toast.open();
                     }
                 },
                 handleResponse: function (e, detail) {
@@ -496,6 +498,7 @@
                     item.metric = metricValue;
                     this.push('metricArray', item);
                     if (this.metricArray.length == this.selected.length) {
+                        this.$.error_toast.toggle();
                         this.open = true;
                         console.log(this.metricArray);
                         //this.$.data_toast.open();
