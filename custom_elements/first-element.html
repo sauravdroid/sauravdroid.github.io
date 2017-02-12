@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="import" href="tab-element.html">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <dom-module id="first-element">
     <template>
         <style>
@@ -21,13 +22,13 @@
         <paper-dialog id="scrolling">
             <h1>Analysis</h1>
             <paper-dialog-scrollable>
-                <template is="dom-if" if="{{open}}">
-                    <my-tab id="tab" metric1="{{top5}}" metric2="{{bottom5}}" metric3="{{metricArray}}"></my-tab>
-                </template>
+
+                <my-tab id="tab" metric1="{{top5}}" metric2="{{bottom5}}" metric3="{{metricArray}}"></my-tab>
+
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <paper-toast id="error_toast" text="Items Needs To Be Selcted"></paper-toast>
+        <paper-toast duration="0" id="error_toast" text="Items Needs To Be Selcted"></paper-toast>
         <paper-toast id="data_toast" text="All Items" duration="0">
             <ul>
                 <template id="temp2" is="dom-repeat" items="{{metricArray}}">
@@ -104,11 +105,11 @@
                         type: Boolean,
                         value: false
                     },
-                    top5:{
-                        type:Array
+                    top5: {
+                        type: Array
                     },
-                    bottom5:{
-                        type:Array
+                    bottom5: {
+                        type: Array
                     }
                 },
                 ready: function () {
@@ -504,6 +505,7 @@
                         //this.$.data_toast.open();
                         this.top5 = top5(this.metricArray);
                         this.bottom5 = bottom5(this.metricArray);
+                        this.$.tab.reDrawChart();
                         this.$.scrolling.open();
                     }
                 },
@@ -520,6 +522,7 @@
                 }
                 return sum / items.length;
             }
+
             function top5(metric) {
                 var metric_new = [];
                 metric.sort(function (a, b) {
