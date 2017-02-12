@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html"/>
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html"/>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <dom-module id="my-tab">
     <style>
         :root {
@@ -16,11 +15,13 @@
                 font-size: 20px;
             }
         }
-        .container{
+
+        .container {
             display: inline-flex;
             flex-direction: row;
         }
-        .list{
+
+        .list {
 
         }
     </style>
@@ -62,8 +63,8 @@
         Polymer({
             is: "my-tab",
             properties: {
-                name:{
-                    type:String
+                name: {
+                    type: String
                 },
                 metric1: {
                     type: Array,
@@ -116,20 +117,40 @@
 
                 // Set a callback to run when the Google Visualization API is loaded.
                 var chart1 = function () {
-                    return drawChart(metric1,'chart_div1');
+                    return drawChart(metric1, 'chart_div1');
                 };
                 var chart2 = function () {
-                    return drawChart(metric2,'chart_div2');
+                    return drawChart(metric2, 'chart_div2');
                 };
                 var chart3 = function () {
-                    return drawChart(metric3,'chart_div3');
+                    return drawChart(metric3, 'chart_div3');
+                };
+                google.charts.setOnLoadCallback(chart1);
+                google.charts.setOnLoadCallback(chart2);
+                google.charts.setOnLoadCallback(chart3);
+            },
+            reDrawChart: function () {
+                var metric1 = this.metric1;
+                var metric2 = this.metric2;
+                var metric3 = this.metric3;
+                google.charts.load('current', {'packages': ['corechart']});
+
+                // Set a callback to run when the Google Visualization API is loaded.
+                var chart1 = function () {
+                    return drawChart(metric1, 'chart_div1');
+                };
+                var chart2 = function () {
+                    return drawChart(metric2, 'chart_div2');
+                };
+                var chart3 = function () {
+                    return drawChart(metric3, 'chart_div3');
                 };
                 google.charts.setOnLoadCallback(chart1);
                 google.charts.setOnLoadCallback(chart2);
                 google.charts.setOnLoadCallback(chart3);
             }
         });
-        function drawChart(metric , element ) {
+        function drawChart(metric, element) {
             console.log(metric);
 //            var metric = [
 //                {name:"Saurav" , metric:1},
