@@ -1,559 +1,195 @@
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="tab-element.html">
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<dom-module id="first-element">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html"/>
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html"/>
+<dom-module id="my-tab">
+    <style>
+        :root {
+            --my-custom-color: red;
+            --paper-tab-ink: var(--my-custom-color);
+
+            /* custom CSS property */
+            --paper-tabs-selection-bar-color: blue;
+
+            /* custom CSS mixin */
+            --paper-tabs: {
+                color: var(--default-primary-color); /* variable defined in default-theme.html */
+                font-size: 20px;
+            }
+        }
+
+        .container {
+            display: inline-flex;
+            flex-direction: row;
+        }
+
+        .list {
+
+        }
+    </style>
     <template>
-        <style>
-            :host {
-                display: inline-block;
-            }
 
-            #selectedItems {
-                position: absolute;
-                right: 10px;
-            }
-        </style>
-
-
-        <paper-dialog id="scrolling">
-            <h1>Analysis</h1>
-            <paper-dialog-scrollable>
-
-                <my-tab id="tab" metric1="{{top5}}" metric2="{{bottom5}}" metric3="{{metricArray}}"></my-tab>
-
-            </paper-dialog-scrollable>
-        </paper-dialog>
-
-        <paper-toast duration="0" id="error_toast" text="Items Needs To Be Selcted"></paper-toast>
-        <paper-toast id="data_toast" text="All Items" duration="0">
-            <ul>
-                <template id="temp2" is="dom-repeat" items="{{metricArray}}">
-                    <li>
-                        <span>{{item.name}} -> {{item.metric}}</span>
-                    </li>
-                    <!--<iron-ajax auto
-                               url="https://www.quandl.com/api/v3/datasets/NSE/{{item.FIELD3}}.json"
-                               params='{"api_key":"gWf2CLShwrGUBVnqzsT4", "start_date":"2015-07-05", "end_date": "2016-05-05"}'
-                               handle-as="json"
-                               last-response="{{ajaxResponse}}" on-response="handleResponse"></iron-ajax>-->
-                </template>
-            </ul>
-            <paper-button onclick="data_toast.toggle()" class="yellow-button">Close</paper-button>
-
-        </paper-toast>
-        <paper-button on-tap="handleClick" raised>Check All</paper-button>
-        <div>Selected Stocks</div>
-        <ul id="selectedItems">
-            <template id="temp1" is="dom-repeat" items="{{selected}}">
-                <li>
-                    <span>{{item.FIELD1}} -> {{item.FIELD3}}</span>
-                </li>
-                <!--<iron-ajax auto
-                           url="https://www.quandl.com/api/v3/datasets/NSE/{{item.FIELD3}}.json"
-                           params='{"api_key":"gWf2CLShwrGUBVnqzsT4", "start_date":"2015-07-05", "end_date": "2016-05-05"}'
-                           handle-as="json"
-                           last-response="{{ajaxResponse}}" on-response="handleResponse"></iron-ajax>-->
-            </template>
-        </ul>
-
-        <table>
-            <thead>
-            <tr>
-                <td>Company</td>
-                <td>Industry</td>
-                <td>Symbol</td>
-                <td>Series</td>
-                <td>IISN Code</td>
-            </tr>
-            </thead>
-            <tbody>
-            <template id="companyList" is="dom-repeat" items="{{company_json}}">
-
-                <tr>
-                    <td>{{item.FIELD1}}</td>
-                    <td>{{item.FIELD2}}</td>
-                    <td>{{item.FIELD3}}</td>
-                    <td>{{item.FIELD4}}</td>
-                    <td>{{item.FIELD5}}</td>
-
-                    <td>
-                        <paper-button toggles on-tap="addItem" raised>Add</paper-button>
-                    </td>
-
-                </tr>
-            </template>
-
-            <array-selector id="selector" items="{{company_json}}" selected="{{selected}}" multi
-                            toggle></array-selector>
-            </tbody>
-        </table>
-        <iron-ajax id="ajax"
-                   url=""
-                   handle-as="json"
-                   on-response="handleResponse"></iron-ajax>
+        <paper-tabs selected="0">
+            <paper-tab>Top 5</paper-tab>
+            <paper-tab>Bottom 5</paper-tab>
+            <paper-tab>All</paper-tab>
+        </paper-tabs>
+        <iron-pages selected="0">
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric1}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div1"></div>
+            </div>
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric2}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div2"></div>
+            </div>
+            <div class="container">
+                <ol class="list">
+                    <template is="dom-repeat" items="{{metric3}}">
+                        <li>{{item.name}} -> {{item.metric}}</li>
+                    </template>
+                </ol>
+                <div class="chart" id="chart_div3"></div>
+            </div>
+        </iron-pages>
     </template>
     <script>
-        HTMLImports.whenReady(function () {
-            Polymer({
-                is: "first-element",
-                properties: {
-                    open: {
-                        type: Boolean,
-                        value: false
-                    },
-                    top5: {
-                        type: Array
-                    },
-                    bottom5: {
-                        type: Array
-                    }
+        Polymer({
+            is: "my-tab",
+            properties: {
+                name: {
+                    type: String
                 },
-                ready: function () {
-                    this.items = [];
-                    this.company_json = [
-                        {
-                            "FIELD1": "ABB India Ltd.",
-                            "FIELD2": "INDUSTRIAL MANUFACTURING",
-                            "FIELD3": "ABB",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE117A01022"
-                        },
-                        {
-                            "FIELD1": "Apollo Hospitals Enterprises Ltd.",
-                            "FIELD2": "HEALTHCARE SERVICES",
-                            "FIELD3": "APOLLOHOSP",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE437A01024"
-                        },
-                        {
-                            "FIELD1": "Ashok Leyland Ltd.",
-                            "FIELD2": "AUTOMOBILE",
-                            "FIELD3": "ASHOKLEY",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE208A01029"
-                        },
-                        {
-                            "FIELD1": "Bajaj Finance Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "BAJFINANCE",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE296A01024"
-                        },
-                        {
-                            "FIELD1": "Bajaj Finserv Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "BAJAJFINSV",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE918I01018"
-                        },
-                        {
-                            "FIELD1": "Bharat Electronics Ltd.",
-                            "FIELD2": "INDUSTRIAL MANUFACTURING",
-                            "FIELD3": "BEL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE263A01016"
-                        },
-                        {
-                            "FIELD1": "Bharat Forge Ltd.",
-                            "FIELD2": "INDUSTRIAL MANUFACTURING",
-                            "FIELD3": "BHARATFORG",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE465A01025"
-                        },
-                        {
-                            "FIELD1": "Britannia Industries Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "BRITANNIA",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE216A01022"
-                        },
-                        {
-                            "FIELD1": "Cadila Healthcare Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "CADILAHC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE010B01027"
-                        },
-                        {
-                            "FIELD1": "Castrol India Ltd.",
-                            "FIELD2": "ENERGY",
-                            "FIELD3": "CASTROLIND",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE172A01027"
-                        },
-                        {
-                            "FIELD1": "Colgate Palmolive (India) Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "COLPAL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE259A01022"
-                        },
-                        {
-                            "FIELD1": "Container Corporation of India Ltd.",
-                            "FIELD2": "SERVICES",
-                            "FIELD3": "CONCOR",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE111A01017"
-                        },
-                        {
-                            "FIELD1": "Cummins India Ltd.",
-                            "FIELD2": "INDUSTRIAL MANUFACTURING",
-                            "FIELD3": "CUMMINSIND",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE298A01020"
-                        },
-                        {
-                            "FIELD1": "DLF Ltd.",
-                            "FIELD2": "CONSTRUCTION",
-                            "FIELD3": "DLF",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE271C01023"
-                        },
-                        {
-                            "FIELD1": "Dabur India Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "DABUR",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE016A01026"
-                        },
-                        {
-                            "FIELD1": "Divi's Laboratories Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "DIVISLAB",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE361B01024"
-                        },
-                        {
-                            "FIELD1": "Emami Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "EMAMILTD",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE548C01032"
-                        },
-                        {
-                            "FIELD1": "GlaxoSmithkline Consumer Healthcare Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "GSKCONS",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE264A01014"
-                        },
-                        {
-                            "FIELD1": "Glaxosmithkline Pharmaceuticals Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "GLAXO",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE159A01016"
-                        },
-                        {
-                            "FIELD1": "Glenmark Pharmaceuticals Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "GLENMARK",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE935A01035"
-                        },
-                        {
-                            "FIELD1": "Godrej Consumer Products Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "GODREJCP",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE102D01028"
-                        },
-                        {
-                            "FIELD1": "Havells India Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "HAVELLS",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE176B01034"
-                        },
-                        {
-                            "FIELD1": "Hindustan Petroleum Corporation Ltd.",
-                            "FIELD2": "ENERGY",
-                            "FIELD3": "HINDPETRO",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE094A01015"
-                        },
-                        {
-                            "FIELD1": "Hindustan Zinc Ltd.",
-                            "FIELD2": "METALS",
-                            "FIELD3": "HINDZINC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE267A01025"
-                        },
-                        {
-                            "FIELD1": "Indiabulls Housing Finance Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "IBULHSGFIN",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE148I01020"
-                        },
-                        {
-                            "FIELD1": "Indian Oil Corporation Ltd.",
-                            "FIELD2": "ENERGY",
-                            "FIELD3": "IOC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE242A01010"
-                        },
-                        {
-                            "FIELD1": "InterGlobe Aviation Ltd.",
-                            "FIELD2": "SERVICES",
-                            "FIELD3": "INDIGO",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE646L01027"
-                        },
-                        {
-                            "FIELD1": "JSW Steel Ltd.",
-                            "FIELD2": "METALS",
-                            "FIELD3": "JSWSTEEL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE019A01038"
-                        },
-                        {
-                            "FIELD1": "LIC Housing Finance Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "LICHSGFIN",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE115A01026"
-                        },
-                        {
-                            "FIELD1": "Marico Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "MARICO",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE196A01026"
-                        },
-                        {
-                            "FIELD1": "Motherson Sumi Systems Ltd.",
-                            "FIELD2": "AUTOMOBILE",
-                            "FIELD3": "MOTHERSUMI",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE775A01035"
-                        },
-                        {
-                            "FIELD1": "NHPC Ltd.",
-                            "FIELD2": "ENERGY",
-                            "FIELD3": "NHPC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE848E01016"
-                        },
-                        {
-                            "FIELD1": "NMDC Ltd.",
-                            "FIELD2": "METALS",
-                            "FIELD3": "NMDC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE584A01023"
-                        },
-                        {
-                            "FIELD1": "Oil India Ltd.",
-                            "FIELD2": "ENERGY",
-                            "FIELD3": "OIL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE274J01014"
-                        },
-                        {
-                            "FIELD1": "Oracle Financial Services Software Ltd.",
-                            "FIELD2": "IT",
-                            "FIELD3": "OFSS",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE881D01027"
-                        },
-                        {
-                            "FIELD1": "Pidilite Industries Ltd.",
-                            "FIELD2": "CHEMICALS",
-                            "FIELD3": "PIDILITIND",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE318A01026"
-                        },
-                        {
-                            "FIELD1": "Piramal Enterprises Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "PEL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE140A01024"
-                        },
-                        {
-                            "FIELD1": "Power Finance Corporation Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "PFC",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE134E01011"
-                        },
-                        {
-                            "FIELD1": "Procter & Gamble Hygiene & Health Care Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "PGHH",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE179A01014"
-                        },
-                        {
-                            "FIELD1": "Punjab National Bank",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "PNB",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE160A01022"
-                        },
-                        {
-                            "FIELD1": "Shree Cement Ltd.",
-                            "FIELD2": "CEMENT & CEMENT PRODUCTS",
-                            "FIELD3": "SHREECEM",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE070A01015"
-                        },
-                        {
-                            "FIELD1": "Shriram Transport Finance Co. Ltd.",
-                            "FIELD2": "FINANCIAL SERVICES",
-                            "FIELD3": "SRTRANSFIN",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE721A01013"
-                        },
-                        {
-                            "FIELD1": "Siemens Ltd.",
-                            "FIELD2": "INDUSTRIAL MANUFACTURING",
-                            "FIELD3": "SIEMENS",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE003A01024"
-                        },
-                        {
-                            "FIELD1": "Steel Authority of India Ltd.",
-                            "FIELD2": "METALS",
-                            "FIELD3": "SAIL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE114A01011"
-                        },
-                        {
-                            "FIELD1": "Titan Company Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "TITAN",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE280A01028"
-                        },
-                        {
-                            "FIELD1": "Torrent Pharmaceuticals Ltd.",
-                            "FIELD2": "PHARMA",
-                            "FIELD3": "TORNTPHARM",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE685A01028"
-                        },
-                        {
-                            "FIELD1": "UPL Ltd.",
-                            "FIELD2": "FERTILISERS & PESTICIDES",
-                            "FIELD3": "UPL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE628A01036"
-                        },
-                        {
-                            "FIELD1": "United Breweries Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "UBL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE686F01025"
-                        },
-                        {
-                            "FIELD1": "United Spirits Ltd.",
-                            "FIELD2": "CONSUMER GOODS",
-                            "FIELD3": "MCDOWELL-N",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE854D01016"
-                        },
-                        {
-                            "FIELD1": "Vedanta Ltd.",
-                            "FIELD2": "METALS",
-                            "FIELD3": "VEDL",
-                            "FIELD4": "EQ",
-                            "FIELD5": "INE205A01025"
-                        }
-                    ];
-                    this.metricArray = [];
+                metric1: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 1},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 4},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
                 },
-                handleClick: function () {
-                    this.set('metricArray', []);
-                    if (this.selected.length < 1) {
-                        this.$.error_toast.open();
-                    } else {
-                        for (var i = 0; i < this.selected.length; i++) {
-                            this.$.ajax.url = "https://www.quandl.com/api/v3/datasets/NSE/" + this.selected[i].FIELD3 + ".json";
-                            this.$.ajax.params = {
-                                "api_key": "gWf2CLShwrGUBVnqzsT4",
-                                "start_date": "2015-07-05",
-                                "end_date": "2016-05-05"
-                            };
-                            this.$.ajax.generateRequest();
-                        }
-                        this.$.error_toast.innerHTML = "Loading Please Wait";
-                        this.$.error_toast.open();
-                    }
+                metric2: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 15},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 17},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
                 },
-                handleResponse: function (e, detail) {
-                    var item = {name: "", metric: ""};
-                    var response = detail.xhr.response;
-                    var data = response.dataset;
-                    var dataArray = data.data;
-                    //console.log(data);
-                    var average = getAverage(dataArray);
-                    var last_close = dataArray[0][5];
-                    var metricValue = last_close / average;
-                    item.name = response.dataset.dataset_code;
-                    item.metric = metricValue;
-                    this.push('metricArray', item);
-                    if (this.metricArray.length == this.selected.length) {
-                        this.$.error_toast.toggle();
-                        this.open = true;
-                        console.log(this.metricArray);
-                        //this.$.data_toast.open();
-                        this.top5 = top5(this.metricArray);
-                        this.bottom5 = bottom5(this.metricArray);
-                        this.$.tab.reDrawChart();
-                        this.$.scrolling.open();
-                    }
-                },
-                addItem: function (e) {
-                    var item = this.$.companyList.itemForElement(e.target);
-                    this.$.selector.select(item);
+                metric3: {
+                    type: Array,
+                    value: [
+                        {name: "Saurav", metric: 10},
+                        {name: "Umaima", metric: 2},
+                        {name: "Shaunak", metric: 3},
+                        {name: "Suraj", metric: 5},
+                        {name: "Arjun", metric: 6},
+                        {name: "Rahul", metric: 7},
+                        {name: "Tuhin", metric: 8}
+                    ]
                 }
-            });
-            function getAverage(items) {
-                var sum = 0;
-
-                for (var i = 0; i < items.length; i++) {
-                    sum += items[i][5];
-                }
-                return sum / items.length;
-            }
-
-            function top5(metric) {
-                var metric_new = [];
-                metric.sort(function (a, b) {
-                    return b.metric - a.metric;
+            },
+            ready: function () {
+                console.log(this.name);
+                var pages = this.$$('iron-pages');
+                var tabs = this.$$('paper-tabs');
+                var metric1 = this.metric1;
+                var metric2 = this.metric2;
+                var metric3 = this.metric3;
+                tabs.addEventListener('iron-select', function () {
+                    pages.selected = tabs.selected;
                 });
-                if (metric.length < 5) {
-                    metric_new = metric;
-                } else {
-                    for (var k = 0; k < 5; k++) {
-                        metric_new.push(metric[k]);
-                    }
-                }
-                return metric_new;
-            }
+                google.charts.load('current', {'packages': ['corechart']});
 
-            function bottom5(metric) {
-                var metric_new = [];
-                metric.sort(function (a, b) {
-                    return b.metric - a.metric;
-                });
+                // Set a callback to run when the Google Visualization API is loaded.
+                var chart1 = function () {
+                    return drawChart(metric1, 'chart_div1');
+                };
+                var chart2 = function () {
+                    return drawChart(metric2, 'chart_div2');
+                };
+                var chart3 = function () {
+                    return drawChart(metric3, 'chart_div3');
+                };
+                google.charts.setOnLoadCallback(chart1);
+                google.charts.setOnLoadCallback(chart2);
+                google.charts.setOnLoadCallback(chart3);
+            },
+            reDrawChart: function () {
+                var metric1 = this.metric1;
+                var metric2 = this.metric2;
+                var metric3 = this.metric3;
+                google.charts.load('current', {'packages': ['corechart']});
 
-                if (metric.length < 5) {
-                    metric_new = metric;
-                } else {
-                    for (var j = metric.length - 1; j >= metric.length - 5; j--) {
-                        metric_new.push(metric[j]);
-                    }
-                }
-                return metric_new;
+                // Set a callback to run when the Google Visualization API is loaded.
+                var chart1 = function () {
+                    return drawChart(metric1, 'chart_div1');
+                };
+                var chart2 = function () {
+                    return drawChart(metric2, 'chart_div2');
+                };
+                var chart3 = function () {
+                    return drawChart(metric3, 'chart_div3');
+                };
+                google.charts.setOnLoadCallback(chart1);
+                google.charts.setOnLoadCallback(chart2);
+                google.charts.setOnLoadCallback(chart3);
             }
         });
+        function drawChart(metric, element) {
+            console.log(metric);
+//            var metric = [
+//                {name:"Saurav" , metric:1},
+//                {name:"Umaima" , metric:2},
+//                {name:"Shaunak" , metric:3},
+//                {name:"Suraj" , metric:4},
+//                {name:"Arjun" , metric:6},
+//                {name:"Rahul" , metric:7},
+//                {name:"Tuhin" , metric:8}
+//            ];
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Slices');
+            data.addRows(
+                    convertJSON(metric)
+            );
 
+            // Set chart options
+            var options = {
+                'title': 'Stock Items',
+                'width': 400,
+                'height': 300
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.BarChart(document.getElementById(element));
+            chart.draw(data, options);
+        }
+        function convertJSON(metric) {
+            var metric_new = [];
+            for (var i = 0; i < metric.length; i++) {
+                var metric_nested = [];
+                metric_nested.push(metric[i].name);
+                metric_nested.push(metric[i].metric);
+                metric_new.push(metric_nested);
+                //console.log(metric_nested);
+            }
+            return metric_new;
+        }
     </script>
 </dom-module>
